@@ -102,5 +102,10 @@ def pesquisar(request):
 
 @api_view(['GET'])
 def receitas_gostadas(request):
-    utilizador = request.GET()
-    receitas = ReceitasGostadas.objects.get()
+    utilizador = request.GET['utilizador']
+    receitas_gostadas = ReceitasGostadas.objects.filter(utilizador=utilizador)
+    receitas = [receitas_gostada.receita for receitas_gostada in receitas_gostadas]
+    serializer = ReceitaSerializer(receitas, many=True)
+    return Response(serializer.data)
+
+

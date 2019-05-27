@@ -28,6 +28,7 @@ urlpatterns = [
     path('receitasutilizador', views.get_receitas_utilizador),
     path('receitastag', views.get_receitas_tag),
     path('comentar', views.comentar_receita),
-    path('pesquisar', views.pesquisar)
+    path('pesquisar', views.pesquisar),
+    path('receitasgostadas', views.receitas_gostadas)
 ]
 
