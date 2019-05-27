@@ -109,3 +109,10 @@ def receitas_gostadas(request):
     return Response(serializer.data)
 
 
+@api_view(['GET'])
+def receitas_mais_likes(request):
+    listaReceitas = Receita.objects.order_by("-classificacao")[0:6]
+    serializer = ReceitaSerializer(listaReceitas, many=True)
+    return Response(serializer.data)
+
+
