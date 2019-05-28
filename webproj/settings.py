@@ -134,3 +134,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 # added by HTZ
 STATIC_ROOT = os.path.join(BASE_DIR, 'app/static')
+
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'app/media')

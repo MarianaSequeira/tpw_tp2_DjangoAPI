@@ -2,9 +2,11 @@ from app.models import *
 from rest_framework import  serializers
 
 class ReceitaSerializer(serializers.ModelSerializer):
+    imagem = serializers.ImageField(max_length=None, use_url=True)
+
     class Meta:
         model = Receita
-        fields = ('nome', 'descricao', 'tipo', 'preparacao', 'tempo', 'tempo', 'dificuldade', 'dose', 'data', 'utilizador', 'classificacao')
+        fields = ('nome', 'descricao', 'tipo', 'preparacao', 'tempo', 'tempo', 'dificuldade', 'dose', 'data', 'utilizador', 'classificacao', 'imagem')
 
 
 class IngredientesSerializer(serializers.ModelSerializer):
