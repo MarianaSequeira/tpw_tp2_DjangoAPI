@@ -1,0 +1,209 @@
+{% extends "layout.html" %}
+{% load widget_tweaks %}
+
+{% block scripts %}
+    <script>
+    $(document).ready(function () {
+            console.log("test");
+    });
+
+    function updateElementIndex(el, prefix, ndx) {
+            var id_regex = new RegExp('(' + prefix + '-\\d+)');
+            var replacement = prefix + '-' + ndx;
+            if ($(el).attr("for")) $(el).attr("for", $(el).attr("for").replace(id_regex, replacement));
+            if (el.id) el.id = el.id.replace(id_regex, replacement);
+            if (el.name) el.name = el.name.replace(id_regex, replacement);
+        }
+
+        function cloneMore(selector, prefix, total) {
+            var newElement = $(selector).clone(true);
+            total++;
+            newElement.find(':button').each(function () {
+                $(this).attr({'id': total});
+            });
+            newElement.find(':input').each(function () {
+                var name = $(this).attr('name')
+                if (name) {
+                    name = name.replace('-' + (total - 1) , '-' + total );
+                    var id = name;
+                    console.log(name)
+                    $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
+                }
+            });
+            total++;
+            $('#id_' + prefix + '-TOTAL_FORMS').val(total);
+            $(selector).after(newElement);
+            var conditionRow = $('.form-row:not(:last)');
+            conditionRow.find('.btn.add-form-row')
+                .removeClass('btn-success').addClass('btn-danger')
+                .removeClass('add-form-row').addClass('remove-form-row')
+                .html('-');
+            return false;
+        }
+
+        function deleteForm(prefix, btn, total) {
+            if (total > 1) {
+                btn.closest('.form-row').remove();
+                var forms = $('.form-row');
+                console.log(prefix)
+                $('#id_' + prefix + '-TOTAL_FORMS').val(forms.length);
+                for (var i = 0, formCount = forms.length; i < formCount; i++) {
+                    $(forms.get(i)).find(':input').each(function () {
+                        updateElementIndex(this, prefix, i);
+                    });
+                }
+            }
+            return false;
+        }
+
+        $(document).on('click', '.add-form-row', function (e) {
+            e.preventDefault();
+            total = $(this).attr('id');
+            console.log(total)
+            cloneMore('.form-row:last', 'form', total);
+            return false;
+        });
+
+        $(document).on('click', '.remove-form-row', function (e) {
+            e.preventDefault();
+            deleteForm('form', $(this));
+            return false;
+        });
+
+    (function () {
+        'use strict';
+        window.addEventListener('load', function () {
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.getElementsByClassName('needs-validation');
+            // Loop over them and prevent submission
+            var validation = Array.prototype.filter.call(forms, function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+
+
+    </script>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container body-content">
+        <h3 class="text-center text-uppercase text-secondary mb-0" style="margin-top: 4rem">Adicionar Receita</h3>
+        <hr class="star-dark mb-5" style="margin-top: 1.5rem">
+
+        <form class="needs-validation" id="receita" action="." method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="nomeReceita">Nome:</label>
+                <input type="text" class="form-control" name="nome" id="nomeReceita" placeholder="nome da receita" required>
+            </div>
+            <div class="row">
+                <div class="form-group col">
+                    <label for="descricaoReceita">Descrição:</label>
+                    <textarea class="form-control" name="descricao" id="descricaoReceita" rows="4" required></textarea>
+                </div>
+                <div class="form-group col">
+                    <label for="passoReceita">Passos de preparação:</label>
+                    <textarea class="form-control" name="passos" id="passoReceita" rows="4" required></textarea>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-6">
+                    <label>Tipo:</label>
+                    <div class="radio">
+                        <label><input type="radio" name="tipoReceita" value="carne" required>Carne</label>
+                    </div>
+                    <div class="radio">
+                        <label><input type="radio" name="tipoReceita" value="peixe" required>Peixe</label>
+                    </div>
+                    <div class="radio">
+                        <label><input type="radio" name="tipoReceita" value="sopa" required>Sopa</label>
+                    </div>
+                    <div class="radio">
+                        <label><input type="radio" name="tipoReceita" value="sobremesa" required>Sobremesa</label>
+                    </div>
+                    <div class="radio">
+                        <label><input type="radio" name="tipoReceita" value="vegetariano" required>Vegetariano</label>
+                    </div>
+                    <div class="radio">
+                        <label><input type="radio" name="tipoReceita" value="acompanhamento" required>Acompanhamento</label>
+                    </div>
+                </div>
+                <div class="form-group col-6">
+                    <label>Dificuldade:</label>
+                    <div class="radio">
+                        <label><input type="radio" name="dificuldade" value="Muito fácil" required>Muito fácil</label>
+                    </div>
+                    <div class="radio">
+                        <label><input type="radio" name="dificuldade" value="Fácil" required>Fácil</label>
+                    </div>
+                    <div class="radio">
+                        <label><input type="radio" name="dificuldade" value="Médio" required>Médio</label>
+                    </div>
+                    <div class="radio">
+                        <label><input type="radio" name="dificuldade" value="Difícil" required>Difícil</label>
+                    </div>
+                    <div class="radio">
+                        <label><input type="radio" name="dificuldade" value="Muito difícil" required>Muito difícil</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col">
+                    <label for="tempo">Tempo estimado (min):</label>
+                    <input class="form-control" type="number" name="tempo" id="tempo" min="0" required>
+                </div>
+                <div class="form-group col">
+                    <label for="dose">Dose:</label>
+                    <input class="form-control" type="number" name="dose" id="dose" min="0" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col">
+                    <label for="image">Imagem:</label>
+                    <input type="file" class="form-control-file" name="imagem" id="imagem" required>
+                </div>
+            </div>
+
+            <h3 class="text-center text-uppercase text-secondary mb-0" style="margin-top: 4rem">Adicionar Ingredientes</h3>
+            <hr class="star-dark mb-5" style="margin-top: 1.5rem">
+
+            <div class="row form-row form-group spacer">
+                <div class="form-group col-5">
+                    <label for="">Nome do ingrediente:</label>
+                    <input type="text" name="ing-0" id="ing-0" required>
+                </div>
+                <div class="form-group col-3">
+                    <label for="">Dose:</label>
+                    <input type="number" name="qt-0" step="0.5" id="qt-0" required>
+                </div>
+                <div class="form-group col-3">
+                    <label for="">Unidade:</label>
+                    <select name="un-0" id="in-0" required>
+                        <option value="sem unidade">unidade(s)</option>
+                        <option value="mL">mL</option>
+                        <option value="L">L</option>
+                        <option value="g">g</option>
+                        <option value="g">kg</option>
+                        <option value="chávena">chávena</option>
+                        <option value="colher de sopa">c. sopa</option>
+                        <option value="colher de chá">c. chá</option>
+                        <option value="colher de café">c. café</option>
+                    </select>
+                </div>
+                <div class="input-group-append">
+                    <button class="btn btn-success add-form-row" id="0">+</button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+{% endblock %}
