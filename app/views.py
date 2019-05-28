@@ -116,3 +116,14 @@ def receitas_mais_likes(request):
     return Response(serializer.data)
 
 
+@api_view(['GET'])
+def ingredientes_receita(request):
+    id = request.GET['id']
+    receita = Receita.objects.get(id=id)
+    lst_ingredientes = Ingredientes.objects.filter(receita=receita)
+    serializer = IngredientesSerializer(lst_ingredientes, many=True)
+    return Response(serializer.data)
+
+
+
+

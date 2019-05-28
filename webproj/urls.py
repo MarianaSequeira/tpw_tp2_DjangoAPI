@@ -32,7 +32,8 @@ urlpatterns = [
     path('comentar', views.comentar_receita),
     path('pesquisar', views.pesquisar),
     path('receitasgostadas', views.receitas_gostadas),
-    path('receitasmaislikes', views.receitas_mais_likes)
+    path('receitasmaislikes', views.receitas_mais_likes),
+    path('ingredientesreceita', views.ingredientes_receita)
 ]
 
 if settings.DEBUG:
