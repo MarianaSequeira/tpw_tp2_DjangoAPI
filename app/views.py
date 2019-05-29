@@ -72,7 +72,8 @@ def get_receitas_utilizador(request):
 @api_view(['GET'])
 def get_receitas_guardadas(request):
     utilizador = request.GET['utilizador']
-    receitas = ReceitasGuardadas.objects.filter(utilizador=utilizador)
+    receitasGuardadas = ReceitasGuardadas.objects.filter(utilizador=utilizador)
+    receitas = [receita.receita for receita in receitasGuardadas]
     serializer = ReceitaSerializer(receitas, many=True)
     return Response(serializer.data)
 
