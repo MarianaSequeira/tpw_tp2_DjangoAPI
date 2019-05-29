@@ -25,6 +25,7 @@ urlpatterns = [
     path('receita', views.get_receita),
     path('addreceita', views.save_receita),
     path('receitas', views.get_receitas),
+    path('receitatipo', views.get_receita_tipo),
     path('deletereceita/<int:id>', views.delete_receita),
     path('receitasguardadas', views.get_receitas_guardadas),
     path('receitasutilizador', views.get_receitas_utilizador),
@@ -32,7 +33,6 @@ urlpatterns = [
     path('comentar', views.comentar_receita),
     path('pesquisar', views.pesquisar),
     path('receitasgostadas', views.receitas_gostadas),
-    path('receitasmaislikes', views.receitas_mais_likes),
     path('ingredientesreceita', views.ingredientes_receita)
 ]
 

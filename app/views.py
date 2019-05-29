@@ -15,6 +15,17 @@ def get_receita(request):
     return Response(serializer.data)
 
 
+@api_view(['GET'])
+def get_receita_tipo(request):
+    tipo = request.GET['tipo']
+    if tipo == 'like':
+        receitas = Receita.objects.order_by("-classificacao")[0:6]
+    else:
+        receitas = receitas = Receita.objects.filter(tipo=tipo)
+    serializer = ReceitaSerializer(receitas, many=True)
+    return Response(serializer.data)
+
+
 @api_view(['POST'])
 def save_receita(request):
     serializer = ReceitaSerializer(data=request.data)
@@ -106,13 +117,6 @@ def receitas_gostadas(request):
     receitas_gostadas = ReceitasGostadas.objects.filter(utilizador=utilizador)
     receitas = [receitas_gostada.receita for receitas_gostada in receitas_gostadas]
     serializer = ReceitaSerializer(receitas, many=True)
-    return Response(serializer.data)
-
-
-@api_view(['GET'])
-def receitas_mais_likes(request):
-    listaReceitas = Receita.objects.order_by("-classificacao")[0:6]
-    serializer = ReceitaSerializer(listaReceitas, many=True)
     return Response(serializer.data)
 
 
