@@ -18,7 +18,7 @@ class IngredientesSerializer(serializers.ModelSerializer):
 class TagsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tags
-        fields = ('nome')
+        fields = ('nome', )
 
 
 class ComentarioSerializer(serializers.ModelSerializer):

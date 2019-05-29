@@ -54,16 +54,17 @@ def get_receitas(request):
 
 @api_view(['GET'])
 def get_tags_receita(request):
-    idReceita = request.POST(['id'])
+    idReceita = request.GET['id']
     receita = Receita.objects.get(id=idReceita)
     tags = [tag for tag in Tags.objects.all() if receita in tag.receitas.all()]
+    print(tags)
     serializer = TagsSerializer(tags, many=True)
     return Response(serializer.data)
 
 
 @api_view(['GET'])
 def get_receitas_tag(request):
-    nome_tag = request.POST['tag']
+    nome_tag = request.GET['tag']
     tag = Tags.objects.get(nome=nome_tag)
     receitas = tag.receitas.all()
     serializer = ReceitaSerializer(receitas, many=True)
