@@ -1,6 +1,6 @@
 from rest_framework import status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from rest_framework.permissions import  IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from app.serializers import *
@@ -109,10 +109,10 @@ def comentar_receita(request):
 
 @api_view(['GET'])
 def pesquisar(request):
-    if 'query' in request.POST:
+    if 'query' in request.GET:
         query = request.POST['query']
         queryResult = Receita.objects.filter(nome__contains=query)
-    if 'tags' in request.POST and len(request.POST.getlist('tags', [])) > 1:
+    if 'tags' in request.GET and len(request.POST.getlist('tags', [])) > 1:
         lst_tags = request.POST.getlist('tags', [])
         temp_receitas = []
         for t in lst_tags:
@@ -152,6 +152,11 @@ def tags(request):
     tags = Tags.objects.all()
     serializer = TagsSerializer(tags, many=True)
     return Response(serializer.data)
+
+
+@api_view(['PUT'])
+def add_receita_tag(request):
+    pass
 
 
 
