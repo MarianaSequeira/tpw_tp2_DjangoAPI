@@ -110,10 +110,10 @@ def comentar_receita(request):
 @api_view(['GET'])
 def pesquisar(request):
     if 'query' in request.GET:
-        query = request.POST['query']
+        query = request.GET['query']
         queryResult = Receita.objects.filter(nome__contains=query)
     if 'tags' in request.GET and len(request.POST.getlist('tags', [])) > 1:
-        lst_tags = request.POST.getlist('tags', [])
+        lst_tags = request.GET.getlist('tags', [])
         temp_receitas = []
         for t in lst_tags:
             if t == '':
