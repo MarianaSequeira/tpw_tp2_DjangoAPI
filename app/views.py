@@ -1,5 +1,7 @@
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.permissions import  IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from app.serializers import *
 from datetime import datetime
@@ -27,6 +29,7 @@ def get_receita_tipo(request):
 
 
 @api_view(['POST'])
+#permission
 def save_receita(request):
     serializer = ReceitaSerializer(data=request.data)
     if serializer.is_valid():
@@ -36,6 +39,8 @@ def save_receita(request):
 
 
 @api_view(['DELETE'])
+@authentication_classes((TokenAuthentication, ))
+@permission_classes((IsAuthenticated, ))
 def delete_receita(request, id):
     try:
         receita = Receita.objects.get(id=id)
@@ -57,7 +62,6 @@ def get_tags_receita(request):
     idReceita = request.GET['id']
     receita = Receita.objects.get(id=idReceita)
     tags = [tag for tag in Tags.objects.all() if receita in tag.receitas.all()]
-    print(tags)
     serializer = TagsSerializer(tags, many=True)
     return Response(serializer.data)
 
@@ -72,6 +76,7 @@ def get_receitas_tag(request):
 
 
 @api_view(['GET'])
+#permission
 def get_receitas_utilizador(request):
     utilizador = request.GET['utilizador']
     receitas = Receita.objects.filter(utilizador=utilizador)
@@ -80,6 +85,7 @@ def get_receitas_utilizador(request):
 
 
 @api_view(['GET'])
+#permission
 def get_receitas_guardadas(request):
     utilizador = request.GET['utilizador']
     receitasGuardadas = ReceitasGuardadas.objects.filter(utilizador=utilizador)
@@ -89,6 +95,7 @@ def get_receitas_guardadas(request):
 
 
 @api_view(['POST'])
+#permission
 def comentar_receita(request):
     id_receita = request.POST['id_receita']
     utilizador = request.POST['utilizador']
@@ -123,6 +130,7 @@ def pesquisar(request):
 
 
 @api_view(['GET'])
+#permission
 def receitas_gostadas(request):
     utilizador = request.GET['utilizador']
     receitas_gostadas = ReceitasGostadas.objects.filter(utilizador=utilizador)
@@ -138,6 +146,14 @@ def ingredientes_receita(request):
     lst_ingredientes = Ingredientes.objects.filter(receita=receita)
     serializer = IngredientesSerializer(lst_ingredientes, many=True)
     return Response(serializer.data)
+
+@api_view(['GET'])
+def tags(request):
+    tags = Tags.objects.all()
+    serializer = TagsSerializer(tags, many=True)
+    return Response(serializer.data)
+
+
 
 
 
