@@ -109,11 +109,14 @@ def comentar_receita(request):
 
 @api_view(['GET'])
 def pesquisar(request):
+    print(request.GET)
     if 'query' in request.GET:
         query = request.GET['query']
         queryResult = Receita.objects.filter(nome__contains=query)
-    if 'tags' in request.GET and len(request.POST.getlist('tags', [])) > 1:
+    if 'tags' in request.GET:
+        print('aqui')
         lst_tags = request.GET.getlist('tags', [])
+        print(lst_tags)
         temp_receitas = []
         for t in lst_tags:
             if t == '':
@@ -123,7 +126,7 @@ def pesquisar(request):
             for r in queryResult:
                 if r in tag_receitas:
                     temp_receitas.append(r)
-
+        print(temp_receitas)
         queryResult = temp_receitas
     serializer = ReceitaSerializer(queryResult, many=True)
     return Response(serializer.data)
