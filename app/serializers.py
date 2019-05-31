@@ -23,6 +23,6 @@ class TagsSerializer(serializers.ModelSerializer):
 
 class ComentarioSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Ingredientes
+        model = Comentario
         fields = ('comentario', 'data', 'utilizador')
 

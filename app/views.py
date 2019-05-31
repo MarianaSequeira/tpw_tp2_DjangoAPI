@@ -115,6 +115,15 @@ def comentar_receita(request):
 
 
 @api_view(['GET'])
+def get_comentarios_receita(request):
+    id_receita = request.GET['id']
+    receita = Receita.objects.get(id=id_receita)
+    lst_comentarios = Comentario.objects.filter(receita=receita)
+    serializer = ComentarioSerializer(lst_comentarios, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
 def pesquisar(request):
     print(request.GET)
     if 'query' in request.GET:
@@ -181,6 +190,7 @@ class CustomAuthToken(ObtainAuthToken):
             'username': user.username,
             'token': token.key
         })
+
 
 
 
