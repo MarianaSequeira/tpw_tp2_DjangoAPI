@@ -1,4 +1,6 @@
 from rest_framework import status
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
@@ -14,6 +16,7 @@ def get_receita(request):
     except Receita.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     serializer = ReceitaSerializer(receita)
+    print(serializer.data)
     return Response(serializer.data)
 
 
@@ -29,7 +32,8 @@ def get_receita_tipo(request):
 
 
 @api_view(['POST'])
-#permission
+@authentication_classes((TokenAuthentication, ))
+@permission_classes((IsAuthenticated, ))
 def save_receita(request):
     serializer = ReceitaSerializer(data=request.data)
     if serializer.is_valid():
@@ -76,7 +80,8 @@ def get_receitas_tag(request):
 
 
 @api_view(['GET'])
-#permission
+@authentication_classes((TokenAuthentication, ))
+@permission_classes((IsAuthenticated, ))
 def get_receitas_utilizador(request):
     utilizador = request.GET['utilizador']
     receitas = Receita.objects.filter(utilizador=utilizador)
@@ -85,7 +90,8 @@ def get_receitas_utilizador(request):
 
 
 @api_view(['GET'])
-#permission
+@authentication_classes((TokenAuthentication, ))
+@permission_classes((IsAuthenticated, ))
 def get_receitas_guardadas(request):
     utilizador = request.GET['utilizador']
     receitasGuardadas = ReceitasGuardadas.objects.filter(utilizador=utilizador)
@@ -95,7 +101,8 @@ def get_receitas_guardadas(request):
 
 
 @api_view(['POST'])
-#permission
+@authentication_classes((TokenAuthentication, ))
+@permission_classes((IsAuthenticated, ))
 def comentar_receita(request):
     id_receita = request.POST['id_receita']
     utilizador = request.POST['utilizador']
@@ -133,7 +140,8 @@ def pesquisar(request):
 
 
 @api_view(['GET'])
-#permission
+@authentication_classes((TokenAuthentication, ))
+@permission_classes((IsAuthenticated, ))
 def receitas_gostadas(request):
     utilizador = request.GET['utilizador']
     receitas_gostadas = ReceitasGostadas.objects.filter(utilizador=utilizador)
@@ -162,6 +170,17 @@ def add_receita_tag(request):
     pass
 
 
+class CustomAuthToken(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({
+            'username': user.username,
+            'token': token.key
+        })
 
 
 

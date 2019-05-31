@@ -22,6 +22,7 @@ from django.conf.urls.static import static
 from app import views
 
 urlpatterns = [
+    path('authenticate', views.CustomAuthToken.as_view()),
     path('receita', views.get_receita),
     path('addreceita', views.save_receita),
     path('receitas', views.get_receitas),
