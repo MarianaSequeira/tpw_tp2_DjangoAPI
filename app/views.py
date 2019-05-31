@@ -174,9 +174,28 @@ def tags(request):
     return Response(serializer.data)
 
 
-@api_view(['PUT'])
-def add_receita_tag(request):
-    pass
+@api_view(['POST'])
+@authentication_classes((TokenAuthentication, ))
+@permission_classes((IsAuthenticated, ))
+def gostar_receita(request):
+    id_receita = request.data['id_receita']
+    username = request.data['username']
+    receita = Receita.objects.get(id=id_receita)
+    receitaGostada = ReceitasGostadas(receita=receita, utilizador=username)
+    receitaGostada.save()
+    return Response(status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+@authentication_classes((TokenAuthentication, ))
+@permission_classes((IsAuthenticated, ))
+def guardar_receita(request):
+    id_receita = request.data['id_receita']
+    username = request.data['username']
+    receita = Receita.objects.get(id=id_receita)
+    receitaGuardada = ReceitasGuardadas(receita=receita, utilizador=username)
+    receitaGuardada.save()
+    return Response(status=status.HTTP_201_CREATED)
 
 
 class CustomAuthToken(ObtainAuthToken):
