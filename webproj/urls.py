@@ -39,7 +39,8 @@ urlpatterns = [
     path('ingredientesreceita', views.ingredientes_receita),
     path('tags', views.tags),
     path('gostarreceita', views.gostar_receita),
-    path('guardarreceita', views.guardar_receita)
+    path('guardarreceita', views.guardar_receita),
+    path('extrainfo', views.get_extra_info)
 ]
 
 if settings.DEBUG:

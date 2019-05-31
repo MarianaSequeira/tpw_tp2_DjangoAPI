@@ -16,7 +16,6 @@ def get_receita(request):
     except Receita.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     serializer = ReceitaSerializer(receita)
-    print(serializer.data)
     return Response(serializer.data)
 
 
@@ -104,9 +103,9 @@ def get_receitas_guardadas(request):
 @authentication_classes((TokenAuthentication, ))
 @permission_classes((IsAuthenticated, ))
 def comentar_receita(request):
-    id_receita = request.POST['id_receita']
-    utilizador = request.POST['utilizador']
-    comentario = request.POST['comentario']
+    id_receita = request.data['id_receita']
+    utilizador = request.data['utilizador']
+    comentario = request.data['comentario']
     receita = Receita.objects.get(id=id_receita)
     c = Comentario(receita=receita, data=datetime.now().strftime('%Y-%m-%d'), utilizador=utilizador,
                    comentario=comentario)
@@ -178,11 +177,19 @@ def tags(request):
 @authentication_classes((TokenAuthentication, ))
 @permission_classes((IsAuthenticated, ))
 def gostar_receita(request):
-    id_receita = request.data['id_receita']
-    username = request.data['username']
+    id_receita = request.data['id']
+    username = request.data['utilizador']
     receita = Receita.objects.get(id=id_receita)
-    receitaGostada = ReceitasGostadas(receita=receita, utilizador=username)
-    receitaGostada.save()
+
+    if ReceitasGostadas.objects.filter(receita=receita, utilizador=username):
+        ReceitasGostadas.objects.get(receita=receita, utilizador=username).delete()
+        receita.classificacao -= 1
+        receita.save()
+    else:
+        receitaGostada = ReceitasGostadas(receita=receita, utilizador=username)
+        receitaGostada.save()
+        receita.classificacao += 1
+        receita.save()
     return Response(status=status.HTTP_201_CREATED)
 
 
@@ -190,12 +197,39 @@ def gostar_receita(request):
 @authentication_classes((TokenAuthentication, ))
 @permission_classes((IsAuthenticated, ))
 def guardar_receita(request):
-    id_receita = request.data['id_receita']
-    username = request.data['username']
+    id_receita = request.data['id']
+    username = request.data['utilizador']
     receita = Receita.objects.get(id=id_receita)
-    receitaGuardada = ReceitasGuardadas(receita=receita, utilizador=username)
-    receitaGuardada.save()
+
+    if ReceitasGuardadas.objects.filter(receita=receita, utilizador=username):
+        ReceitasGuardadas.objects.get(receita=receita, utilizador=username).delete()
+    else:
+        receitaGuardada = ReceitasGuardadas(receita=receita, utilizador=username)
+        receitaGuardada.save()
     return Response(status=status.HTTP_201_CREATED)
+
+
+@api_view(['GET'])
+def get_extra_info(request):
+    id_receita = request.GET['id']
+    receita = Receita.objects.get(id=id_receita)
+
+    saved = ReceitasGuardadas.objects.filter(receita=receita, utilizador=request.user)
+    liked = ReceitasGostadas.objects.filter(receita=receita, utilizador=request.user)
+
+    if not saved:
+        bookclass = "far fa-bookmark"
+    else:
+        bookclass = "fas fa-bookmark"
+
+    if not liked:
+        likeclass = "far fa-heart"
+    else:
+        likeclass = "fas fa-heart"
+
+    content = {'bookclass': bookclass, 'likeclass': likeclass}
+    return Response(content)
+
 
 
 class CustomAuthToken(ObtainAuthToken):

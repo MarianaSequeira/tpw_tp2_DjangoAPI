@@ -26,3 +26,6 @@ class ComentarioSerializer(serializers.ModelSerializer):
         model = Comentario
         fields = ('comentario', 'data', 'utilizador')
 
+
+
+
