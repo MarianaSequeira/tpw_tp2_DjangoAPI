@@ -18,7 +18,7 @@ Including another URLconf
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-
+from django.contrib import admin
 from app import views
 
 urlpatterns = [
@@ -40,7 +40,9 @@ urlpatterns = [
     path('tags', views.tags),
     path('gostarreceita', views.gostar_receita),
     path('guardarreceita', views.guardar_receita),
-    path('extrainfo', views.get_extra_info)
+    path('extrainfo', views.get_extra_info),
+    path('signup', views.sign_up),
+    path('admin/', admin.site.urls),
 ]
 
 if settings.DEBUG:

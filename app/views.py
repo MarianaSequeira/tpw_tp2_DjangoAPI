@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
@@ -34,11 +35,29 @@ def get_receita_tipo(request):
 @authentication_classes((TokenAuthentication, ))
 @permission_classes((IsAuthenticated, ))
 def save_receita(request):
-    serializer = ReceitaSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    print(request.FILES)
+    nome = request.data['nome']
+    descricao = request.data['descricao']
+    preparacao = request.data['preparacao']
+    tipoReceita = request.data['tipoReceita']
+    tempo = request.data['tempo']
+    nivel = request.data['nivel']
+    dose = request.data['dose']
+    utilizador = request.data['utilizador']
+    imagem = request.data['imagem']
+    print(imagem)
+    receita = Receita(nome=nome, descricao=descricao, preparacao=preparacao, tipo=tipoReceita, tempo=tempo, dificuldade=nivel, dose=dose, imagem=imagem, data=datetime.now().strftime('%Y-%m-%d'), classificacao=0, utilizador=utilizador)
+    receita.save()
+    for ingrediente in request.data['ingredientes']:
+        nome = ingrediente['ingrediente']
+        quantidade = ingrediente['quantidade']
+        unidade = ingrediente['unidade']
+        new_ingrediente = Ingredientes(receita=receita, ingredienteName=nome, ingredienteQuant=quantidade, unidade=unidade)
+        new_ingrediente.save()
+    for tag in request.data['tags']:
+        t = Tags.objects.get(nome=tag)
+        t.receitas.add(receita)
+    return Response(status=status.HTTP_201_CREATED)
 
 
 @api_view(['DELETE'])
@@ -229,6 +248,17 @@ def get_extra_info(request):
 
     content = {'bookclass': bookclass, 'likeclass': likeclass}
     return Response(content)
+
+
+@api_view(['POST'])
+def sign_up(request):
+    print('aqui')
+    username = request.data['username']
+    password = request.data['password']
+    user = User.objects.create(username=username, password=password)
+    user.set_password(user.password)
+    user.save()
+    return Response(status=status.HTTP_201_CREATED)
 
 
 
