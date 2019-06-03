@@ -8,6 +8,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from app.serializers import *
 from datetime import datetime
+from app.utils import ImageReader
 
 @api_view(['GET'])
 def get_receita(request):
@@ -44,9 +45,49 @@ def save_receita(request):
     nivel = request.data['nivel']
     dose = request.data['dose']
     utilizador = request.data['utilizador']
-    imagem = request.data['imagem']
-    print(imagem)
+    imagem64 = request.data['imagem']
+    imageReader = ImageReader.ImageReader()
+    imagem = imageReader.to_internal_value(imagem64)
     receita = Receita(nome=nome, descricao=descricao, preparacao=preparacao, tipo=tipoReceita, tempo=tempo, dificuldade=nivel, dose=dose, imagem=imagem, data=datetime.now().strftime('%Y-%m-%d'), classificacao=0, utilizador=utilizador)
+    receita.save()
+    for ingrediente in request.data['ingredientes']:
+        nome = ingrediente['ingrediente']
+        quantidade = ingrediente['quantidade']
+        unidade = ingrediente['unidade']
+        new_ingrediente = Ingredientes(receita=receita, ingredienteName=nome, ingredienteQuant=quantidade, unidade=unidade)
+        new_ingrediente.save()
+    for tag in request.data['tags']:
+        t = Tags.objects.get(nome=tag)
+        t.receitas.add(receita)
+    return Response(status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+@authentication_classes((TokenAuthentication, ))
+@permission_classes((IsAuthenticated, ))
+def update_receita(request):
+    id_receita = request.data['id']
+    receita = Receita.objects.get(id=id_receita)
+    tags_receita = Tags.objects.filter(receitas=receita)
+    ingredientes_receita = Ingredientes.objects.filter(receita=receita)
+    for ingrediente in ingredientes_receita:
+        ingrediente.delete()
+    for tag in tags_receita:
+        tag.receitas.remove(receita)
+
+    receita.nome = request.data['nome']
+    receita.descricao = request.data['descricao']
+    receita.preparacao = request.data['preparacao']
+    receita.tipo = request.data['tipoReceita']
+    receita.tempo = request.data['tempo']
+    receita.dificuldade = request.data['nivel']
+    receita.dose = request.data['dose']
+    imagem64 = request.data['imagem']
+    if imagem64 != '':
+        print('aqui')
+        imageReader = ImageReader.ImageReader()
+        imagem = imageReader.to_internal_value(imagem64)
+        receita.imagem = imagem
     receita.save()
     for ingrediente in request.data['ingredientes']:
         nome = ingrediente['ingrediente']

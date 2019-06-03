@@ -25,6 +25,7 @@ urlpatterns = [
     path('authenticate', views.CustomAuthToken.as_view()),
     path('receita', views.get_receita),
     path('addreceita', views.save_receita),
+    path('updatereceita', views.update_receita),
     path('receitas', views.get_receitas),
     path('receitatipo', views.get_receita_tipo),
     path('deletereceita/<int:id>', views.delete_receita),
